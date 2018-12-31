@@ -1,0 +1,49 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="iso-8859-1">
+<title>brython interactive mode</title>
+<script src="brython-3.6.3/www/src/brython.js"></script>
+<script src="brython-3.6.3/www/src/brython_stdlib.js"></script>
+<style>
+html, body {
+    padding: 0px;
+    margin: 0px;
+}
+div,
+textarea {
+    padding: 10px;
+}
+.codeArea {
+  padding: 0;
+  overflow: auto;
+  background-color: #000000;
+  color: #ffffff;
+  font-family: Consolas, Menlo, Monaco, 'Lucida Console', 'Liberation Mono', 
+      'DejaVu Sans Mono', 'Bitstream Vera Sans Mono', 
+      'Courier New', monospace, serif;
+  font-size: 14px;
+}
+
+/*html, body {height:100%,width:100%}*/
+</style>
+
+</head>
+<body id="sandbox" onload="brython(1)">
+
+<textarea id="code" class="codeArea" rows=20 cols=80></textarea>
+<script type="text/python3" src="console.py" id="__main__"></script>
+<script type="text/javascript">
+let codeTextArea = document.getElementById("code");
+new ResizeObserver(resizeTextArea).observe(codeTextArea);
+function resizeTextArea () {  
+  //console.log ("textarea=",codeTextArea.scrollWidth, codeTextArea.scrollHeight);
+  parent.adjustIframe(codeTextArea.scrollWidth, codeTextArea.scrollHeight);    
+}
+resizeTextArea();
+</script>
+</body>
+</html>
+
+
+

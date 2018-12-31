@@ -1,0 +1,74 @@
+<script id="redirect_console">
+let _old_console_log = window.console.log;
+let _console_text = document.createElement("textarea")
+_console_text.id="console";
+_console_text.autocomplete = "off";
+
+function _replace_console() {
+	window.console.log = function (...args) {
+		for (let a of args) {
+			_console_text.value += a;
+		}
+	}
+}
+_replace_console();
+
+function _restore_console() {
+	window.console.log = _old_console_log;
+}
+
+function _runBrython () {
+	try {
+		brython()
+	}
+	catch (err) {
+		window.console.log (err)
+	}
+	finally {
+		_restore_console()
+	}
+}
+</script>
+<script src="./brython.js"></script>
+<script src="./brython_stdlib.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.7.2/p5.min.js"></script>
+<script src="codesetup.js"></script>
+<script type="text/python" id="redirect_print">
+from browser import document as doc
+import sys
+##
+# Redirect output to console textarea 
+##
+def console_write(data):
+    doc['console'].value += str(data)
+
+sys.stdout.write = sys.stderr.write = console_write
+</script>
+<link rel="stylesheet" type="text/css" href="runframe.css">
+
+<script id="main" type="text/python">
+import p5py
+
+def setup():
+    createCanvas(700, 410)
+    background(200)
+    print ("started")
+        
+def draw():
+    if mouseIsPressed: 
+    	if mouseButton != LEFT: background(200)
+    	ellipse(mouseX,mouseY,50,50)
+
+def keyPressed():
+    background(200)
+
+p5py.run()
+</script>
+
+<body onload="_runBrython()">
+<script>
+	let _body = document.getElementsByTagName("body")[0];
+	_body.appendChild(_console_text);
+</script>	
+<input type=button onclick="codeSetup.stop()" style="width:100px;" value="stop" />
+</body>

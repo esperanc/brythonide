@@ -1,0 +1,65 @@
+<!doctype html>
+<html>
+<head>
+<meta name="description" content="Analog clock demo written in Brython www.brython.info">
+<meta name="keywords" content="Python,Brython">
+<meta name="author" content="Glenn Linderman">
+<meta charset="iso-8859-1">
+<meta http-equiv="Content-Script-Type" content="text/javascript">
+
+<script type="text/javascript" src="../src/brython.js"></script>
+
+<style>
+#drop_zone {
+  border: 2px dashed #bbb;
+  border-radius: 5px;
+  padding: 25px;
+  text-align: center;
+  font: 20pt bold;
+  color: #bbb;
+}
+</style>
+</head>
+
+<body onLoad="brython(1)">
+<p>
+
+<div id="drop_zone">Drop files here</div>
+<output id="list"></output>
+
+<script type="text/python">
+from browser import document, alert, window
+import browser.html as html
+
+Date = window.Date.new
+
+def handleFileSelect(evt):
+    evt.stopPropagation()
+    evt.preventDefault()
+
+    files = evt.dataTransfer.files # FileList object.
+    print(files)
+
+    # files is a FileList of File objects. List some properties.
+    output = []
+    _ul = html.UL()
+    for f in files:
+        last_mod = Date(f.lastModified) if f.lastModified else "n/a"
+        _ul <= html.LI(f'{f.name}({f.type or "n/a"}) - {f.size} bytes, ' +
+            f'last modified: {last_mod}')
+
+    document['list'] <= _ul
+
+def handleDragOver(evt):
+    evt.stopPropagation()
+    evt.preventDefault()
+    evt.dataTransfer.dropEffect = 'copy' # Explicitly show this is a copy.
+
+# Setup the dnd listeners.
+dropZone = document['drop_zone']
+dropZone.bind('dragover', handleDragOver)
+dropZone.bind('drop', handleFileSelect)
+</script>
+
+</body>
+</html>

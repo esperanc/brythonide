@@ -1,0 +1,21 @@
+<script type="text/javascript">
+function adjustIframeOnLoad() { 
+	document.getElementById("console-iframe").style.height = 
+	document.getElementById("console-iframe").contentWindow.document.body.scrollHeight + "px";
+	document.getElementById("console-iframe").style.width = 
+	document.getElementById("console-iframe").contentWindow.document.body.scrollWidth + "px"; 
+}
+function adjustIframe(w,h) { 
+	document.getElementById("console-iframe").style.width = parseInt(w) + "px"; 
+	document.getElementById("console-iframe").style.height = parseInt(h) + "px"; 
+}
+</script>
+
+<div style="border:2px solid #666; border-radius:11px; display: inline-block; padding:20px;">
+
+	<iframe id="console-iframe" src="console.html" style="margin:0; border:none; overflow:hidden;" scrolling="no" onload="adjustIframeOnLoad()">
+	
+	</iframe>
+
+</div>
+

@@ -1,0 +1,57 @@
+<html>
+<head>
+    <title>Getting Started with Three.js - Brython version</title>
+    <meta charset="iso-8859-1">
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/three.js/r79/three.min.js"></script>
+<script type="text/javascript" src="../src/brython.js"></script>
+
+    <script type="text/python">
+        print('start ...')
+        from browser import document as doc
+        from browser import window
+        
+        THREE = window.THREE
+
+        cameraC = THREE.PerspectiveCamera.new
+        camera = cameraC( 75, 1, 1, 10000 )
+        camera.position.z = 1000;
+
+        sceneC = THREE.Scene.new
+        scene = sceneC()
+
+        geometryC = THREE.CubeGeometry.new
+        geometry = geometryC(200, 200, 200)
+        materialC = THREE.MeshBasicMaterial.new
+
+        material = materialC( { "color": "#ff0000", "wireframe": True } )
+
+        meshC = THREE.Mesh.new
+        mesh = meshC( geometry, material )
+        scene.add( mesh );
+
+        rendererC = THREE.WebGLRenderer.new
+        renderer = rendererC()
+        renderer.setSize( 444,444);
+
+
+        doc <= renderer.domElement
+        renderer.render( scene, camera )
+
+        def animate(i):
+            # note: three.js includes requestAnimationFrame shim
+            window.requestAnimationFrame( animate );
+
+            mesh.rotation.x += 0.01;
+            mesh.rotation.y += 0.02;
+
+            renderer.render( scene, camera );   
+
+        animate(0)
+
+    </script>
+
+</head>
+<body onload="brython(1)">
+    <div id="test"></div>
+</body>
+</html>

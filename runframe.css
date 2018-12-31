@@ -1,0 +1,26 @@
+body {
+	display: flex;
+	margin: 0px;
+  	flex-direction: column;
+  	overflow: hidden;
+}
+#console {
+	display:flex;
+	order: 2;
+	width: 400px;
+	height: 120px;
+	font-family: monospace;
+	overflow: scroll;
+	border: 1px solid lightgray;
+	border-radius: 6px;
+	padding: 5px;
+	margin:5px;
+	resize:both;
+	
+}
+canvas {
+	display:flex;
+	order: 1;
+	border: 1px solid lightgray;
+	margin:5px;
+}

@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<header>
+<style>
+#sourceArea {
+    
+    position: relative;
+    /*float: left;*/
+    border: 1px solid lightgray;
+	margin: 5px 5px 0px 5px;
+    
+}
+
+/*#interactive {
+    position: relative;
+    width: 100%;
+    left:0; top:0; width:100%;
+    border: 1px solid lightgray;
+    margin: 5px 5px 0px 5px;       
+}*/
+#editor { 
+	position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    width: 600px;
+    height: 400px;
+    overflow: scroll;
+    resize:both;
+}
+#runFrame {
+	position: relative;
+	float: left;
+	border: 0px;
+	width: 100%;
+}
+.frame {
+	border: 1px solid lightgray;
+	background: lightgray;
+	border-radius: 6px;
+	padding: 5px;
+	margin: 5px 5px 0px 5px;
+}
+.button {
+    border-radius: 6px;
+    border: solid 1px gray;
+    background: #f5f5f5;
+    color: black;
+    padding: 4px 6px;
+    text-decoration: none;
+    font-family: sans-serif;
+    font-size: 11px;
+    -webkit-user-select: none;  /* Chrome all / Safari all */
+    -moz-user-select: none;     /* Firefox all */
+    -ms-user-select: none;      /* IE 10+ */
+    user-select: none;          /* Likely future */
+}
+.title {
+	font-family: 'Dosis', sans-serif;
+	margin: 5px;
+}
+#centralarea {
+    position:relative;
+    float:left;
+    clear: both;
+    display:flex;
+    flex-direction:row;
+} 
+#runDiv {
+    flex-grow: 1;
+    flex-shrink: 1;
+}
+#interactiveDiv {
+    display:flex;
+    flex-direction:column;
+}
+#interactiveDiv iframe {
+    height:346px;
+    width:656px;
+    border: 0;
+    padding: 2px;
+    overflow: hidden;
+}
+#footer {
+	position:relative;
+    float:left;
+    clear: both;
+    display: none;
+}
+</style>
+<link href="https://fonts.googleapis.com/css?family=Dosis:500" rel="stylesheet">
+<script src="lz-string.js"></script>
+<script src="http://cdnjs.cloudflare.com/ajax/libs/ace/1.3.1/ace.js"></script>
+<script src="FileSaver.js"></script>
+<script>
+  function resizeIframe(obj){
+     obj.style.height = obj.style.width = 0;
+     try {
+     	obj.style.width = obj.contentWindow.document.body.scrollWidth + 'px';
+     	obj.style.height = obj.contentWindow.document.body.scrollHeight + 'px';
+     } catch (err) {
+     	console.log ("null iframe");
+     }
+  }
+  function adjustIframeOnLoad() { 
+    document.getElementById("consoleIframe").style.height = 
+    document.getElementById("consoleIframe").contentWindow.document.body.scrollHeight + "px";
+    document.getElementById("consoleIframe").style.width = 
+    document.getElementById("consoleIframe").contentWindow.document.body.scrollWidth + "px"; 
+  }
+  function adjustIframe(w,h) { 
+    document.getElementById("consoleIframe").style.width = parseInt(w) + "px"; 
+    document.getElementById("consoleIframe").style.height = parseInt(h) + "px"; 
+  }
+
+</script>
+</header>
+<body>
+
+<div id="header">
+	<h2 class="title"> Python/Processing IDE </h2>
+	<span class="title" style="font-size: 10pt"> An integrated development environment using 
+		<a href="https://brython.info">Brython</a> and 
+	    <a href="https://p5js.org">P5JS</a><br>
+	</span>
+</div>
+
+<div id="topmenu">
+	<div class="frame">
+    <button id="new" class="button" onclick="newProgram()">New</button>
+    <button id="run" class="button" onclick="runProgram()">Run</button>
+	<button id="clear" class="button" onclick="clearProgram()">Clear</button>
+	<button id="stop" class="button" onclick="stopProgram()">Stop</button>
+    <button id="toggleConsole" class="button" onclick="toggleConsole()">Console</button>
+ 	<label class="button" for="loadfile">Upload</label>
+    <input type="file" id="loadfile" name="files[]" style="visibility:hidden;display:none;" onchange="loadit(this)"></input>
+	<label class="button" onclick="saveit()">Download as</label>
+    <input id="savefilename" type="text" value="program.py"/>
+	</div>
+</div>
+
+<div id="centralarea">
+    <div id="runDiv"></div>
+    <div id="interactiveDiv">
+        <iframe id="consoleIframe" src="./console.html" 
+                style="margin:0; border:none; overflow:hidden; display:none;"
+                scrolling="no" onload="adjustIframeOnLoad()" ></iframe>
+    	<div id="sourceArea">
+    		<div id="editor"></div>
+    	</div>
+    </div>
+</div>
+
+<div id="footer" class="frame">
+	<div id="showurl">
+    <button class="button" onclick="showUrl()">Show URL for this sketch</button><br/>
+    <a id="myurl" href="" title=""></a>
+    </div>
+</div>
+
+<script type="text/javascript">
+
+    // The iframe where the program will run
+    var runFrame;
+
+    // Create runframe
+    function createFrame () {
+        var runDiv = document.getElementById("runDiv");
+        runFrame = document.createElement("iframe");
+        runFrame.id = "runFrame";
+        runFrame.sandbox = "allow-same-origin allow-scripts";
+        runFrame.onload = function() { resizeIframe(runFrame) };
+        runDiv.appendChild(runFrame);
+    }
+
+    // remove runframe from the page
+    function deleteFrame () {
+        var runDiv = document.getElementById("runDiv");
+        runFrame = document.getElementById("runFrame");
+        if (runFrame) runDiv.removeChild(runFrame);
+        runFrame = null;
+    }
+
+
+    // Start the editor
+	var sourceArea = document.getElementById('sourceArea');
+	var localStorage = window.localStorage;
+
+    var changeCount = 0;
+
+	var editor = ace.edit("editor");
+    editor.setTheme("ace/theme/textmate");
+    editor.session.setMode("ace/mode/python");
+
+    // Initial resize of the editor
+    editor.resize();
+
+    // Initial focus on the editor window
+    editor.focus();
+
+    // Maintain the editor window with the right size
+    sourceArea.onmouseup= function() { editor.resize(); }
+
+    // Callback to see keep track of modifications of the program in the editor
+    editor.on ("change", function () { changeCount++ });
+
+    // Load previous program if any
+    if (typeof localStorage["brythonEditor"] != "undefined") {
+    	editor.setValue (localStorage["brythonEditor"]);
+        changeCount = 0;
+    }
+
+    // Load previous program name if any
+    if (typeof localStorage["brythonEditorFilename"] != "undefined") {
+        document.getElementById("savefilename").value = localStorage["brythonEditorFilename"]
+    }
+
+    // Utility to set the contents of the run frame
+	function loadContent(content) {
+		runFrame.contentWindow.document.open();
+		runFrame.contentWindow.document.write(content);
+		runFrame.contentWindow.document.close();	
+	}
+
+    // Fetch the template for the page which will be loaded in the runframe
+    var template = "";
+    fetch("./brythonrun.txt")
+        .then(response=> response.text())
+        .then(text=>{template = text});
+	
+    // id of the setInterval function that resizes the runframe
+	var resizeService;
+	var running = false;
+
+    // Action for the button "New": clears the editor
+    function newProgram() {
+        if (changeCount > 0) {
+            var yes = confirm ("There are unsaved changes. Are you sure you want to start a new program?");
+            if (!yes) return;
+        }
+        clearProgram();
+        editor.setValue ("");
+        localStorage["brythonEditor"] = "";
+        changeCount = 0; 
+        document.getElementById("savefilename").value = "program.py";
+    }
+
+    // Action for the button "Run": runs the program
+	function runProgram() {
+		clearProgram();
+        createFrame();
+		var source = localStorage["brythonEditor"] = editor.getValue();
+        localStorage["brythonEditorFilename"] = document.getElementById("savefilename").value
+		loadContent (template.replace("PROGRAM",source));
+		resizeService = setInterval (function () { resizeIframe(runFrame) }, 500);
+		running = true;
+	}
+
+    // Action for the button "stop": stops the running program
+	function stopProgram(){
+		if (running) {
+			try {
+				runFrame.contentWindow.codeSetup.stop();
+			}
+			catch (err) {
+				console.log ("not running");
+			}
+		}
+        if (resizeService) {
+            clearInterval (resizeService);
+            resizeService = null;
+        }
+		running = false;
+	}
+
+    // Action for the button "clear": stops program and delete the run frame
+	function clearProgram(){
+		stopProgram();
+
+        deleteFrame();
+	}
+
+    // Hides/shows the Brython console
+    function toggleConsole(){
+        let consoleIframe = document.getElementById("consoleIframe");
+        if (consoleIframe.style.display == "none") {
+            consoleIframe.style.display = "block"
+        } else {
+            consoleIframe.style.display = "none"
+        }
+    }
+
+    // Action for the button "download"
+    function saveit() {
+        var data = editor.getValue();
+        var filename = document.getElementById("savefilename").value;
+        var blob = new Blob([data], {type: "text/plain;charset=utf-8"});
+        saveAs(blob, filename);
+        changeCount = 0;
+    }
+
+    // Action for the button "upload"
+    function loadit(input) {
+
+        if (changeCount > 0) {
+            var yes = confirm ("There are unsaved changes. Are you sure you want to load a new program?");
+            if (!yes) return;
+        }
+
+        var components = input.value.split("/");
+        if (components.length < 2) components = input.value.split("\\");
+        var filename = components [components.length-1];
+        var fileobj = input.files[0];
+        var reader = new FileReader();
+
+        // Closure to capture the file information.
+        reader.onload = (function (theFile) {
+            return function (e) {
+                var text = e.target.result;
+                editor.setValue (text);
+                localStorage["brythonEditor"] = text;
+                changeCount = 0;
+ 
+                // clear the input element so that a new load on the same file will work
+                input.value = "";
+                document.getElementById("savefilename").value = filename;
+            };
+        }) (fileobj);
+
+        // Read in the file as a data URL.
+        reader.readAsText(fileobj);
+    }
+
+    // Obtain the url parameter with name theParameter. Returns false
+    // if not specified.
+    function getParameter(theParameter) { 
+        var params = window.location.search.substr(1).split('&');
+
+        for (var i = 0; i < params.length; i++) {
+            var p=params[i].split('=');
+            if (p[0] == theParameter) {
+                if (p.length>1)
+                    return p[1]; 
+                else
+                    return true;
+            }
+        }
+        return false;
+    }
+
+    // Loads program from a given url using XMLHttprequest (must be on the same domain)
+    function loadUrl (url) {
+        function reqListener () {
+            console.log(url+" loaded");
+            editor.setValue(this.responseText);
+            changeCount = 0;
+        }
+
+        var oReq = new XMLHttpRequest();
+        oReq.addEventListener("load", reqListener);
+        oReq.open("GET", url, false); 
+        oReq.send();
+    }
+
+    // Includes an encoded url for this sketch at the bottom of the screen
+    function showUrl() {
+        var link = document.URL;
+        var i = link.indexOf("?");
+        if (i>=0) link = link.substr(0,i);
+        var pgm = editor.getValue(); 
+        var s1 = LZString.compressToEncodedURIComponent(pgm);
+        var s2 = encodeURIComponent(pgm);
+        if (s1.length<s2.length)
+            link = link+"?lzsrc="+s1;
+        else 
+            link = link+"?source="+s2;
+        // if (parms.autoRun) link = link+"&autorun";
+        // if (parms.hideIde) link = link+"&hideide";
+        // if (parms.noTitle) link = link+"&notitle";        
+        // if (parms.noOutput) link = link+"&nooutput";
+        var myurl = document.getElementById('myurl');
+        myurl.setAttribute("href", link);
+        myurl.text=link;
+    }
+
+	//
+	// URL Parameter processing
+	// 
+
+	if (getParameter("showurl") || getParameter("showUrl")) {
+    	document.getElementById("footer").style.display = "inline";
+    }
+
+    var lzsource = getParameter("lzsrc");
+    if (lzsource) {
+        editor.setValue(LZString.decompressFromEncodedURIComponent(lzsource));
+    }
+
+	var programUrl = getParameter("program");
+    if (programUrl) {
+        // Load from file
+        programUrl = decodeURIComponent(programUrl);
+        var components = programUrl.split("/")
+        document.getElementById("savefilename").value = components[components.length-1];
+        loadUrl (programUrl);
+    } 
+    
+	var hideIde = getParameter("hideide") || getParameter("hideIde") ||
+                    getParameter("noide") || getParameter("noIde");
+    if (hideIde) {
+    	for (let element of ["header","topmenu","sourceArea","footer"]) {
+    		document.getElementById(element).style.display = "none";
+    	}
+    }
+
+    var runit = getParameter("autorun") || hideIde;
+
+    // Remove arguments from the location
+    history.pushState(null, "", location.href.split("?")[0]);
+
+    if (runit) {
+    	runProgram();
+    }
+
+    // Prevent silently navigating away from the IDE
+    window.onbeforeunload = function() {
+        if (changeCount==0) return null;
+        return "Have you saved your program?";
+    }
+
+    // Try to save the program to local storage before leaving
+    window.onunload = function () {
+        localStorage["brythonEditor"] = editor.getValue();
+        localStorage["brythonEditorFilename"] = document.getElementById("savefilename").value
+    }
+
+	</script>
+</body>
