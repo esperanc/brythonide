@@ -168,7 +168,7 @@
         var runDiv = document.getElementById("runDiv");
         runFrame = document.createElement("iframe");
         runFrame.id = "runFrame";
-        runFrame.sandbox = "allow-same-origin allow-scripts";
+        runFrame.sandbox = "allow-same-origin allow-scripts allow-modals";
         runFrame.onload = function() { resizeIframe(runFrame) };
         runDiv.appendChild(runFrame);
     }
