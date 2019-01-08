@@ -2,37 +2,26 @@
 <header>
 <style>
 #sourceArea {
-    
-    position: relative;
-    /*float: left;*/
-    border: 1px solid lightgray;
-	margin: 5px 5px 0px 5px;
-    
+    border: 0px solid lightgray;
+	margin: 2px 2px 2px 2px;
+    width:100%;
+    height:100%;
 }
 
-/*#interactive {
-    position: relative;
-    width: 100%;
-    left:0; top:0; width:100%;
-    border: 1px solid lightgray;
-    margin: 5px 5px 0px 5px;       
-}*/
 #editor { 
-	position: absolute;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: 0;
+    margin: 2px;
     width: 600px;
     height: 400px;
     overflow: scroll;
     resize:both;
 }
+
 #runFrame {
 	position: relative;
 	float: left;
 	border: 0px;
-	width: 100%;
+    width: 100%;
+    height: 100%;
 }
 .frame {
 	border: 1px solid lightgray;
@@ -118,11 +107,7 @@
 <body>
 
 <div id="header">
-	<h2 class="title"> Python/Processing IDE </h2>
-	<span class="title" style="font-size: 10pt"> An integrated development environment using 
-		<a href="https://brython.info">Brython</a> and 
-	    <a href="https://p5js.org">P5JS</a><br>
-	</span>
+	<h2 class="title"> <a style="text-decoration: none;" href="https://github.com/esperanc/brythonide">Python/Processing Editor</a></h2>
 </div>
 
 <div id="topmenu">
@@ -139,14 +124,15 @@
 	</div>
 </div>
 
-<div id="centralarea">
+<div id="centralarea" >
     <div id="runDiv"></div>
     <div id="interactiveDiv">
         <iframe id="consoleIframe" src="./console.html" 
                 style="margin:0; border:none; overflow:hidden; display:none;"
                 scrolling="no" onload="adjustIframeOnLoad()" ></iframe>
-    	<div id="sourceArea">
-    		<div id="editor"></div>
+             
+    	<div id="sourceArea" >
+    		<pre id="editor" ></pre>   
     	</div>
     </div>
 </div>
@@ -190,16 +176,20 @@
 
 	var editor = ace.edit("editor");
     editor.setTheme("ace/theme/textmate");
+    //editor.setAutoScrollEditorIntoView(true);
     editor.session.setMode("ace/mode/python");
 
     // Initial resize of the editor
-    editor.resize();
+    function editorResize() {
+        editor.resize();
+    }
+    editorResize();
 
     // Initial focus on the editor window
     editor.focus();
 
     // Maintain the editor window with the right size
-    sourceArea.onmouseup= function() { editor.resize(); }
+    sourceArea.onmouseup= function() { editorResize(); }
 
     // Callback to see keep track of modifications of the program in the editor
     editor.on ("change", function () { changeCount++ });
