@@ -212,11 +212,8 @@
 		runFrame.contentWindow.document.close();	
 	}
 
-    // Fetch the template for the page which will be loaded in the runframe
+    // The run template
     var template = "";
-    fetch("./brythonrun.txt")
-        .then(response=> response.text())
-        .then(text=>{template = text});
 	
     // id of the setInterval function that resizes the runframe
 	var resizeService;
@@ -242,6 +239,7 @@
 		var source = localStorage["brythonEditor"] = editor.getValue();
         localStorage["brythonEditorFilename"] = document.getElementById("savefilename").value
 		loadContent (template.replace("PROGRAM",source));
+        resizeIframe(runFrame);
 		resizeService = setInterval (function () { resizeIframe(runFrame) }, 500);
 		running = true;
 	}
@@ -398,19 +396,30 @@
 	var hideIde = getParameter("hideide") || getParameter("hideIde") ||
                     getParameter("noide") || getParameter("noIde");
     if (hideIde) {
-    	for (let element of ["header","topmenu","sourceArea","footer"]) {
+    	for (let element of ["header","topmenu","footer"]) {
     		document.getElementById(element).style.display = "none";
     	}
+        document.getElementById("interactiveDiv").style.visibility = "hidden";
     }
+
+
 
     var runit = getParameter("autorun") || hideIde;
 
     // Remove arguments from the location
     history.pushState(null, "", location.href.split("?")[0]);
 
-    if (runit) {
-    	runProgram();
-    }
+
+    // Fetch the run template and run the program if autorun is set
+    fetch("./brythonrun.txt")
+        .then(response=> response.text())
+        .then(text=>{
+            template = text;
+            if (runit) {
+                runProgram();
+            }
+        });
+
 
     // Prevent silently navigating away from the IDE
     window.onbeforeunload = function() {
