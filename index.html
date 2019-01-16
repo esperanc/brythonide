@@ -396,18 +396,16 @@
 	var hideIde = getParameter("hideide") || getParameter("hideIde") ||
                     getParameter("noide") || getParameter("noIde");
     if (hideIde) {
-    	for (let element of ["header","topmenu","footer"]) {
+    	for (let element of ["header","topmenu","interactiveDiv","footer"]) {
     		document.getElementById(element).style.display = "none";
     	}
-        document.getElementById("interactiveDiv").style.visibility = "hidden";
     }
-
 
 
     var runit = getParameter("autorun") || hideIde;
 
     // Remove arguments from the location
-    history.pushState(null, "", location.href.split("?")[0]);
+    //history.pushState(null, "", location.href.split("?")[0]);
 
 
     // Fetch the run template and run the program if autorun is set
