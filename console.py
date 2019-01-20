@@ -107,6 +107,7 @@ def myKeyPress(event):
             currentLine = src[src.rfind('...') + 4:]
         if _status == 'main' and not currentLine.strip():
             doc['code'].value += '\n>>> '
+            cursorToEnd()
             event.preventDefault()
             return
         doc['code'].value += '\n'
