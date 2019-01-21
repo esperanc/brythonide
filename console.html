@@ -37,9 +37,11 @@ textarea {
 let codeTextArea = document.getElementById("code");
 new ResizeObserver(resizeTextArea).observe(codeTextArea);
 function resizeTextArea () {  
+  console.log ("scroll",codeTextArea.scrollWidth, codeTextArea.scrollHeight);
+  console.log ("offset",codeTextArea.offsetWidth, codeTextArea.offsetHeight);
   if (parent.adjustIframe) {
-    //console.log (parent.adjustIframe);
-    parent.adjustIframe(codeTextArea.scrollWidth, codeTextArea.scrollHeight); 
+    console.log (parent);
+    parent.adjustIframe(codeTextArea.offsetWidth, codeTextArea.offsetHeight); 
   } 
 }
 resizeTextArea();

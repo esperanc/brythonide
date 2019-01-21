@@ -17,11 +17,8 @@
 }
 
 #runFrame {
-	position: relative;
-	float: left;
-	border: 0px;
-    width: 100%;
-    height: 100%;
+	display: inline-block;
+    border: 0px;
 }
 .frame {
 	border: 1px solid lightgray;
@@ -55,21 +52,17 @@
     display:flex;
     flex-direction:row;
 } 
+
 #runDiv {
-    flex-grow: 1;
-    flex-shrink: 1;
+     display: inline-block;
 }
+
+
 #interactiveDiv {
-    display:flex;
-    flex-direction:column;
+    display: inline-block;
 }
-#interactiveDiv iframe {
-    height:346px;
-    width:656px;
-    border: 0;
-    padding: 2px;
-    overflow: hidden;
-}
+
+
 #footer {
 	position:relative;
     float:left;
@@ -85,17 +78,17 @@
   function resizeIframe(obj){
      obj.style.height = obj.style.width = 0;
      try {
-     	obj.style.width = obj.contentWindow.document.body.scrollWidth + 'px';
-     	obj.style.height = obj.contentWindow.document.body.scrollHeight + 'px';
+     	obj.style.width = obj.contentWindow.document.body.offsetWidth + 'px';
+     	obj.style.height = obj.contentWindow.document.body.offsetHeight + 'px';
      } catch (err) {
      	console.log ("null iframe");
      }
   }
   function adjustIframeOnLoad() { 
     document.getElementById("consoleIframe").style.height = 
-    document.getElementById("consoleIframe").contentWindow.document.body.scrollHeight + "px";
+    document.getElementById("consoleIframe").contentWindow.document.body.offsetHeight + "px";
     document.getElementById("consoleIframe").style.width = 
-    document.getElementById("consoleIframe").contentWindow.document.body.scrollWidth + "px"; 
+    document.getElementById("consoleIframe").contentWindow.document.body.offsetWidth + "px"; 
   }
   function adjustIframe(w,h) { 
     document.getElementById("consoleIframe").style.width = parseInt(w) + "px"; 
