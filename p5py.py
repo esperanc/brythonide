@@ -481,6 +481,7 @@ def run():
         p.mouseDragged = myMouseDragged
         p.mousePressed = myMousePressed
         p.mouseClicked = myMouseClicked
+        p.mouseReleased = myMouseReleased
         p.preload = myPreload
         p.keyTyped = myKeyTyped
         p.keyPressed = myKeyPressed
