@@ -32,7 +32,9 @@ function _runBrython () {
 <script src="./brython.js"></script>
 <script src="./brython_stdlib.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.7.2/p5.min.js"></script>
-<script src="codesetup.js"></script>
+
+<!-- <script src="./p5.js"></script>
+ --><script src="codesetup.js"></script>
 <script type="text/python" id="redirect_print">
 from browser import document as doc
 import sys

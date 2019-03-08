@@ -4,11 +4,25 @@ from browser import window
 p5 = window.p5
 
 def run():
-    
+
     frame = sys._getframe(0)
 
     def sketch(p):
+
+        def setup():
+            p.createCanvas(700, 410)
+            p.background(0)
+            p.rectMode(p.CENTER)
         
+        def draw():
+           # p.background(0)
+            p.fill(255,255,0,128)
+            p.ellipse(p.mouseX,p.mouseY,50,50)
+        
+        def mousePressed():
+            p.background(0)
+        
+
         #
         # Import p5 constants into top level name space
         # 
@@ -130,7 +144,7 @@ def run():
         frame.f_locals["pwinMouseY"] = p.pwinMouseY
         frame.f_locals["registerPreloadMethod"] = p.registerPreloadMethod
         frame.f_locals["registerMethod"] = p.registerMethod
-        #frame.f_locals["print"] = p.print
+        frame.f_locals["print"] = p.print
         frame.f_locals["frameCount"] = p.frameCount
         frame.f_locals["focused"] = p.focused
         frame.f_locals["cursor"] = p.cursor
@@ -392,99 +406,12 @@ def run():
         frame.f_locals["ambientMaterial"] = p.ambientMaterial
         frame.f_locals["specularMaterial"] = p.specularMaterial
 
-        def myCreateCanvas(*args):
-            p.createCanvas(*args)
-            frame.f_locals["width"] = p.width
-            frame.f_locals["height"] = p.height
 
-        frame.f_locals["createCanvas"] = myCreateCanvas
+        frame.f_locals["createCanvas"] = p.createCanvas
 
-        def captureMouse():
-            frame.f_locals["mouseX"] = p.mouseX
-            frame.f_locals["mouseY"] = p.mouseY
-            frame.f_locals["pmouseX"] = p.pmouseX
-            frame.f_locals["pmouseY"] = p.pmouseY
-
-            frame.f_locals["mouseIsPressed"] = p.mouseIsPressed
-            frame.f_locals["mouseButton"] = p.mouseButton
-            frame.f_locals["frameCount"] = p.frameCount
-            frame.f_locals["width"] = p.width
-            frame.f_locals["height"] = p.height
-
-        def captureKeyboard():
-            frame.f_locals["keyCode"] = p.keyCode
-            frame.f_locals["key"] = p.key
-            frame.f_locals["keyIsPressed"] = p.keyIsPressed
-
-
-        def myMousePressed():
-            captureMouse()
-            if 'mousePressed' in frame.f_locals:
-                frame.f_locals['mousePressed']()
-
-        def myMouseReleased():
-            captureMouse()
-            if 'mouseReleased' in frame.f_locals:
-                frame.f_locals['mouseReleased']()
-
-        def myMouseClicked():
-            captureMouse()
-            if 'mouseClicked' in frame.f_locals:
-                frame.f_locals['mouseClicked']()
-
-        def myMouseMoved():
-            captureMouse()
-            if 'mouseMoved' in frame.f_locals:
-                frame.f_locals['mouseMoved']()
-
-        def myMouseDragged():
-            captureMouse()
-            if 'mouseDragged' in frame.f_locals:
-                return frame.f_locals['mouseDragged']()
-
-        def myKeyPressed():
-            captureKeyboard()
-            if 'keyPressed' in frame.f_locals:
-                return frame.f_locals['keyPressed']()
-
-        def myKeyReleased():
-            captureKeyboard()
-            if 'keyReleased' in frame.f_locals:
-                return frame.f_locals['keyReleased']()
-
-        def myKeyTyped():
-            captureKeyboard()
-            if 'keyTyped' in frame.f_locals:
-                return frame.f_locals['keyTyped']()
-
-        def mySetup():
-            captureMouse()
-            if 'setup' in frame.f_locals:
-                frame.f_locals['setup']()
-
-        def myPreload():
-            captureMouse()
-            if 'preload' in frame.f_locals:
-                return frame.f_locals['preload']()
-
-        def myDraw():
-            captureMouse()
-            captureKeyboard()
-            if 'draw' in frame.f_locals:
-                frame.f_locals['draw']()
-
-
-        p.setup = mySetup # setup
-        p.draw = myDraw #draw
-        p.mouseMoved = myMouseMoved
-        p.mouseDragged = myMouseDragged
-        p.mousePressed = myMousePressed
-        p.mouseClicked = myMouseClicked
-        p.mouseReleased = myMouseReleased
-        p.preload = myPreload
-        p.keyTyped = myKeyTyped
-        p.keyPressed = myKeyPressed
-        p.keyReleased = myKeyReleased
-
+        p.setup = frame.f_locals['setup']
+        p.draw = draw
+        p.mousePressed = mousePressed
+        
         
     myp5 = window.p5.new(sketch)

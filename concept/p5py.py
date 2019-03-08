@@ -130,7 +130,7 @@ def run():
         frame.f_locals["pwinMouseY"] = p.pwinMouseY
         frame.f_locals["registerPreloadMethod"] = p.registerPreloadMethod
         frame.f_locals["registerMethod"] = p.registerMethod
-        #frame.f_locals["print"] = p.print
+        frame.f_locals["print"] = p.print
         frame.f_locals["frameCount"] = p.frameCount
         frame.f_locals["focused"] = p.focused
         frame.f_locals["cursor"] = p.cursor
