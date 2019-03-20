@@ -373,11 +373,7 @@
         if (i>=0) link = link.substr(0,i);
         var pgm = editor.getValue(); 
         var s1 = LZString.compressToEncodedURIComponent(pgm);
-        var s2 = encodeURIComponent(pgm);
-        if (s1.length<s2.length)
-            link = link+"?lzsrc="+s1;
-        else 
-            link = link+"?source="+s2;
+        link = link+"?lzsrc="+s1;
         // if (parms.autoRun) link = link+"&autorun";
         // if (parms.hideIde) link = link+"&hideide";
         // if (parms.noTitle) link = link+"&notitle";        
